@@ -1,0 +1,73 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<link rel="stylesheet" href="~/css/index.css" />
+<script src="~/js/index.js"></script>
+
+@foreach (var item in Model.Musics)
+{
+    <script>
+        loadedSongs["@item.Id"] = {
+            name: "@item.Name",
+            src: "/cdn/@item.TrackName"
+        };
+    </script>
+}
+
+<div class="content_container">
+    <section class="left_menu">
+        Left menu
+    </section>
+
+    <section class="grid_container song_list">
+
+        <div class="grid_row">
+            <div class='grid_col-1'>
+                Play
+            </div>
+            <div class='grid_col-4'>Name</div>
+            <div class='grid_col-4'>Author</div>
+            <div class='grid_col-2'>Length</div>
+            <div class='grid_col-1'>Options</div>
+        </div>
+
+
+        @foreach (var item in Model.Musics)
+        {
+            <div class='grid_row'>
+                <div class='grid_col-1'>
+                    <div class="button_play" onclick="changeCurrentSong(@item.Id)">
+                        <i class="fas fa-play"></i>
+                    </div>
+                </div>
+                <div class='grid_col-4'>@item.Name</div>
+                <div class='grid_col-4'>Author</div>
+                <div class='grid_col-2'>Length</div>
+                <div class='grid_col-1'>Options</div>
+            </div>
+
+        }
+
+
+    </section>
+
+    <section class="player_container">
+
+        @if (Model.Musics.Count > 0)
+        {
+            <audio id="player" volume=0.5 controls>
+                <source src="~/cdn/@Model.Musics[0].TrackName" />
+            </audio>
+        }
+        else
+        {
+            <p>No songs added yet</p>
+        }
+    </section>
+</div>
+
+
+

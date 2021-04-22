@@ -1,0 +1,28 @@
+﻿@page
+@model Soundify.Pages.AddSongModel
+@{
+}
+
+<h3>Add music</h3>
+<form method="post" asp-page="AddSong" enctype="multipart/form-data">
+    <table cellpadding="2" cellspacing="2">
+        <tr>
+            <td>Name</td>
+            <td>
+                <input type="text" asp-for="music.Name" />
+            </td>
+        </tr>
+        <tr>
+            <td>Track</td>
+            <td>
+                <input type="file" asp-for="Upload" accept="audio/*" />
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                <input type="submit" value="Save" />
+            </td>
+        </tr>
+    </table>
+</form>

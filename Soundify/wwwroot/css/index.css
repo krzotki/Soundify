@@ -1,0 +1,56 @@
+﻿div.content_container {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: wrap;
+}
+
+.left_menu {
+    height: 90%;
+    width: 20%;
+    display: flex;
+    flex-flow: column;
+}
+
+.song_list {
+    height: 90%;
+    width: 80%;
+}
+
+.song_list > div:nth-child(2n + 1) {
+    background-color: #EEEEEE;
+}
+
+.song_list .grid_row {
+    height: 30px;
+}
+
+.song_list .button_play {
+    border-radius: 50%;
+    outline: none;
+    text-align: center;
+    border: none;
+    box-shadow: 1px 1px 2px #303030;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+
+.song_list .button_play:hover {
+    background-color: #505050;
+    color: white;
+}
+
+.player_container {
+    width: 100%;
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.player_container audio {
+    width: 100%;
+    outline: none;
+}
