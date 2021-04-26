@@ -3,19 +3,29 @@
 @{
 }
 
+
+
 <h3>Add music</h3>
 <form method="post" asp-page="AddSong" enctype="multipart/form-data">
     <table cellpadding="2" cellspacing="2">
         <tr>
             <td>Name</td>
             <td>
-                <input type="text" asp-for="music.Name" />
+                <input id="song_title" type="text" asp-for="music.Name" />
             </td>
         </tr>
+
+        <tr>
+            <td>Author</td>
+            <td>
+                <input id="song_author" type="text" asp-for="music.Author" />
+            </td>
+        </tr>
+
         <tr>
             <td>Track</td>
             <td>
-                <input type="file" asp-for="Upload" accept="audio/*" />
+                <input id="file_input" type="file" asp-for="Upload" accept="audio/*" />
             </td>
         </tr>
         <tr>
@@ -26,3 +36,5 @@
         </tr>
     </table>
 </form>
+
+<script src="~/js/addSong.js"></script>

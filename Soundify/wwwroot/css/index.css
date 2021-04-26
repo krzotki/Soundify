@@ -4,18 +4,53 @@
     box-sizing: border-box;
     display: flex;
     flex-flow: wrap;
+    position: relative;
 }
 
 .left_menu {
-    height: 90%;
+    height: calc(100% - 90px);
     width: 20%;
     display: flex;
     flex-flow: column;
 }
 
-.song_list {
-    height: 90%;
+.song_list_container {
+    height: calc(100% - 90px);
     width: 80%;
+    z-index: 0;
+    position: relative;
+}
+
+.song_list_container .song_list_header {
+    width: calc(100% - 10px);
+    height: 40px;
+    z-index: 1;
+}
+
+.song_list_container .song_list {
+    width: 100%;
+    height: calc(100% - 40px);
+    overflow-y: scroll;
+    z-index: 0;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    box-shadow: inset 0 0 2px #404040;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
 .song_list > div:nth-child(2n + 1) {
@@ -26,31 +61,71 @@
     height: 30px;
 }
 
-.song_list .button_play {
+.song_list .grid_row.active {
+    border: solid 1px #404040;
+    font-weight: 500;
+}
+
+.song_list .grid_row.active.playing .button_play {
+    display: none;
+}
+
+.song_list .grid_row .button_pause {
+    display: none;
+}
+
+.song_list .grid_row.active.playing .button_pause {
+    display: flex;
+}
+
+
+[class*="button_"] {
     border-radius: 50%;
     outline: none;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border: none;
     box-shadow: 1px 1px 2px #303030;
     width: 25px;
     height: 25px;
     cursor: pointer;
+    color: #606060;
 }
 
-.song_list .button_play:hover {
-    background-color: #505050;
+[class*="button_"]:hover {
+    background-color: #606060;
     color: white;
 }
 
 .player_container {
     width: 100%;
-    height: 10%;
+    height: 90px;
     display: flex;
-    justify-content: center;
+    flex-flow: wrap;
+    justify-content: space-evenly;
     align-items: center;
+    background: #f1f3f4;
+    box-shadow: 0px 0px 0px #888, 0px -1px 8px #999;
+    z-index: 1;
 }
 
 .player_container audio {
-    width: 100%;
+    width: 80%;
     outline: none;
 }
+
+.button_previous,
+.button_next {
+    width: 30px;
+    height: 30px;
+    box-shadow: none;
+}
+
+#song_title {
+        width: 100%;
+    text-align: center;
+    padding-top: 7px;
+    font-weight: 400;
+}
+

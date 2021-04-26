@@ -10,10 +10,13 @@
 @foreach (var item in Model.Musics)
 {
     <script>
-        loadedSongs["@item.Id"] = {
+        loadedSongs.push({
             name: "@item.Name",
-            src: "/cdn/@item.TrackName"
-        };
+            author: "@item.Author",
+            duration: "@item.Duration",
+            src: "/cdn/@item.TrackName",
+            id: @item.Id
+        });
     </script>
 }
 
@@ -22,45 +25,75 @@
         Left menu
     </section>
 
-    <section class="grid_container song_list">
-
-        <div class="grid_row">
-            <div class='grid_col-1'>
-                Play
+    <section class="song_list_container">
+        <div class="grid_container song_list_header">
+            <div class="grid_row">
+                <div class='grid_col-1'>
+                    
+                </div>
+                <div class='grid_col-4'>Name</div>
+                <div class='grid_col-4'>Author</div>
+                <div class='grid_col-2'>Duration</div>
+                <div class='grid_col-1'></div>
             </div>
-            <div class='grid_col-4'>Name</div>
-            <div class='grid_col-4'>Author</div>
-            <div class='grid_col-2'>Length</div>
-            <div class='grid_col-1'>Options</div>
         </div>
 
+        <div class="grid_container song_list">
 
-        @foreach (var item in Model.Musics)
-        {
-            <div class='grid_row'>
-                <div class='grid_col-1'>
-                    <div class="button_play" onclick="changeCurrentSong(@item.Id)">
-                        <i class="fas fa-play"></i>
+            @foreach (var item in Model.Musics)
+            {
+                <div class='grid_row song_item @item.Id'>
+                    <div class='grid_col-1'>
+                        <div class="button_play" onclick="setSong(@item.Id, true)">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="button_pause" onclick="setSong(@item.Id, true)">
+                            <i class="fas fa-pause"></i>
+                        </div>
+                    </div>
+                    <div class='grid_col-4'>@item.Name</div>
+                    <div class='grid_col-4'>@item.Author</div>
+                    <div class='grid_col-2'>
+                        @{
+                            TimeSpan t = TimeSpan.FromSeconds(item.Duration);
+
+                            string answer = t.ToString();
+                         }
+                        @answer
+                    </div>
+                    <div class='grid_col-1'>
+                        <div class="button_options">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
                     </div>
                 </div>
-                <div class='grid_col-4'>@item.Name</div>
-                <div class='grid_col-4'>Author</div>
-                <div class='grid_col-2'>Length</div>
-                <div class='grid_col-1'>Options</div>
-            </div>
 
-        }
-
-
+             }
+        </div>
     </section>
 
     <section class="player_container">
 
         @if (Model.Musics.Count > 0)
         {
+            <div id="song_title">
+                
+            </div>
+
+            <div class="button_previous" onclick="previousSong()">
+                <i class="fas fa-backward"></i>
+            </div>
+
             <audio id="player" volume=0.5 controls>
-                <source src="~/cdn/@Model.Musics[0].TrackName" />
+                
             </audio>
+
+            <div class="button_next" onclick="nextSong()">
+                <i class="fas fa-forward"></i>
+            </div>
+            <script>
+                setSong(@Model.Musics[0].Id, false);
+            </script>
         }
         else
         {

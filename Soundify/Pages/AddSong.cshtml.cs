@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using MediaToolkit;
+using MediaToolkit.Model;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,12 +34,20 @@ namespace Soundify.Pages
             using (var memoryStream = new MemoryStream())
             {
                 await Upload.CopyToAsync(memoryStream);
-                if (memoryStream.Length < 10097152)
+                if (memoryStream.Length < 100097152)
                 {
                     string name = music.Name.Replace(" ", "_");
                     string path = Path.Combine(_hostingEnvironment.WebRootPath, "cdn", name + ".wav");
                     await System.IO.File.WriteAllBytesAsync(path, memoryStream.ToArray());
 
+                    var inputFile = new MediaFile { Filename = path };
+
+                    using (var engine = new Engine())
+                    {
+                        engine.GetMetadata(inputFile);
+                    }
+
+                    music.Duration = (int)inputFile.Metadata.Duration.TotalSeconds;
                     music.TrackName = name + ".wav";
                     _db.Musics.Add(music);
 

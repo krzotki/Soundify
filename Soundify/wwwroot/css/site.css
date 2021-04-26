@@ -76,8 +76,7 @@ main {
   margin: 0; }
 
 .grid_container {
-  width: 100%;
-  max-width: 1500px; }
+  width: 100%; }
 
 .grid_row,
 .grid_row::before {
