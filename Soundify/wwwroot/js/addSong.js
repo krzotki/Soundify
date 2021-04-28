@@ -8,6 +8,10 @@ fileInput.addEventListener('change', (evt) => {
 
     if (!title) title = fullName;
 
-    document.getElementById('song_author').value = author;
-    document.getElementById('song_title').value = title;
+    const authorInput = document.getElementById('song_author');
+    authorInput.value = (authorInput.value.length > 0) ? authorInput.value : author;
+
+    const titleInput = document.getElementById('song_title');
+    titleInput.value = (titleInput.value.length > 0) ? titleInput.value : title;
+
 });

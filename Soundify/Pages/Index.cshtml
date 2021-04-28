@@ -5,20 +5,6 @@
 }
 
 <link rel="stylesheet" href="~/css/index.css" />
-<script src="~/js/index.js"></script>
-
-@foreach (var item in Model.Musics)
-{
-    <script>
-        loadedSongs.push({
-            name: "@item.Name",
-            author: "@item.Author",
-            duration: "@item.Duration",
-            src: "/cdn/@item.TrackName",
-            id: @item.Id
-        });
-    </script>
-}
 
 <div class="content_container">
     <section class="left_menu">
@@ -40,67 +26,33 @@
 
         <div class="grid_container song_list">
 
-            @foreach (var item in Model.Musics)
-            {
-                <div class='grid_row song_item @item.Id'>
-                    <div class='grid_col-1'>
-                        <div class="button_play" onclick="setSong(@item.Id, true)">
-                            <i class="fas fa-play"></i>
-                        </div>
-                        <div class="button_pause" onclick="setSong(@item.Id, true)">
-                            <i class="fas fa-pause"></i>
-                        </div>
-                    </div>
-                    <div class='grid_col-4'>@item.Name</div>
-                    <div class='grid_col-4'>@item.Author</div>
-                    <div class='grid_col-2'>
-                        @{
-                            TimeSpan t = TimeSpan.FromSeconds(item.Duration);
-
-                            string answer = t.ToString();
-                         }
-                        @answer
-                    </div>
-                    <div class='grid_col-1'>
-                        <div class="button_options">
-                            <i class="fas fa-ellipsis-h"></i>
-                        </div>
-                    </div>
-                </div>
-
-             }
+          
         </div>
     </section>
 
     <section class="player_container">
 
-        @if (Model.Musics.Count > 0)
-        {
-            <div id="song_title">
+        <div id="song_title">
                 
-            </div>
+        </div>
 
-            <div class="button_previous" onclick="previousSong()">
-                <i class="fas fa-backward"></i>
-            </div>
+        <div class="button_previous" onclick="previousSong()">
+            <i class="fas fa-backward"></i>
+        </div>
 
-            <audio id="player" volume=0.5 controls>
+        <audio id="player" volume=0.5 controls>
                 
-            </audio>
+        </audio>
 
-            <div class="button_next" onclick="nextSong()">
-                <i class="fas fa-forward"></i>
-            </div>
-            <script>
-                setSong(@Model.Musics[0].Id, false);
-            </script>
-        }
-        else
-        {
-            <p>No songs added yet</p>
-        }
+        <div class="button_next" onclick="nextSong()">
+            <i class="fas fa-forward"></i>
+        </div>
+        
+
     </section>
 </div>
+
+<script src="~/js/index.js"></script>
 
 
 
