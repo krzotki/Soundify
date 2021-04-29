@@ -49,7 +49,7 @@ namespace Soundify.Pages
 
                     music.Duration = (int)inputFile.Metadata.Duration.TotalSeconds;
                     music.TrackName = name + ".wav";
-                    _db.Musics.Add(music);
+                    _db.music.Add(music);
 
                     await _db.SaveChangesAsync();
                 }

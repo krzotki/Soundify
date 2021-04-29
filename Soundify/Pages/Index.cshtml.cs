@@ -30,7 +30,7 @@ namespace Soundify.Pages
         public IList<Music> Musics { get; set; }
         public void OnGet()
         {
-            Musics = _db.Musics.ToList();
+            Musics = _db.music.ToList();
         }
     }
 }

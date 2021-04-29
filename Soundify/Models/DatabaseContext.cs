@@ -13,6 +13,9 @@ namespace Soundify.Models
         {
         }
 
-        public DbSet<Music> Musics { get; set; }
+        public DbSet<Music> music { get; set; }
+        public DbSet<Users> users { get; set; }
+        public DbSet<Playlists> playlists { get; set; }
+        public DbSet<PlaylistMusic> playlistMusic { get; set; }
     }
 }

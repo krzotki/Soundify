@@ -8,7 +8,11 @@
 
 <div class="content_container">
     <section class="left_menu">
-        Left menu
+        <input class="search_input name" placeholder="Name..." oninput="handleSearchInputChange('name')" />
+        <input class="search_input author" placeholder="Author..." oninput="handleSearchInputChange('author')" />
+        <div id="playlist_list">
+
+        </div>
     </section>
 
     <section class="song_list_container">
@@ -40,7 +44,7 @@
             <i class="fas fa-backward"></i>
         </div>
 
-        <audio id="player" volume=0.5 controls>
+        <audio id="player" volume=0.5 controls onended="nextSong()">
                 
         </audio>
 

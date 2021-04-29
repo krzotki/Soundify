@@ -17,14 +17,21 @@ namespace Soundify.Pages
             _db = db;
         }
 
-        public JsonResult OnGet(string name, string author)
+        public JsonResult OnGet(string name, string author, int playlist_id)
         {
-            IEnumerable<Music> filteringQuery =
-            from m in _db.Musics
-            where m.Name.Contains(name != null ? name : "") &&
-            m.Author.Contains(author != null ? author : "")
-            select m;
-            return new JsonResult(filteringQuery);
+            IEnumerable<Music> all = _db.music;
+
+            if (playlist_id != 0)
+            {
+                all = from m in _db.music
+                      join pm in _db.playlistMusic on m.Id equals pm.music_id
+                      where
+                      pm.playlist_id == playlist_id
+                      select m;
+            }
+
+            return new JsonResult(all.Where(m => m.Name.Contains(name != null ? name : "") &&
+            m.Author.Contains(author != null ? author : "")));
         }
     }
 }

@@ -13,7 +13,9 @@ String.prototype.toHHMMSS = function () {
 
 
 let loadedSongs = [];
+let loadedPlaylists = [];
 
+let CURRENT_PLAYLIST;
 let CURRENT_SONG;
 
 const setSong = (id, play = false) => {
@@ -58,17 +60,12 @@ const setActive = (id) => {
 
 };
 
-const fetchAllSongs = (onLoad, filter) => {
-    let query = '?';
-    for (let option in filter) {
-        if (filter[option]) query += `${option}=${filter[option]}&`;
-    }
-
-    fetch(`GetSongs${query}`)
-        .then(response => response.json())
-        .then(json => onLoad(json));
+const handleSearchInputChange = (filter) => {
+    const input = document.querySelector(`input.search_input.${filter}`);
+    globalSongFilter[filter] = input.value;
+    fetchSongs();
 };
-
+    
 const makeDiv = (classes, clickHandler) => {
     const div = document.createElement('div');
     classes.forEach(className => div.classList.add(className));
@@ -140,16 +137,75 @@ const refreshSongList = () => {
 
 };
 
+const setCurrentPlaylist = (id) => {
+    globalSongFilter.playlist_id = id;
+    CURRENT_PLAYLIST = id;
+};
+
+const refreshPlaylists = () => {
+    const container = document.querySelector('div#playlist_list');
+    container.innerHTML = '';
+
+    const allSongsButton = makeDiv(['playlist_item', 'all_songs'], () => {
+        setCurrentPlaylist(0);
+        fetchSongs();
+    });
+    allSongsButton.textContent = 'All songs';
+    container.append(allSongsButton);
+
+
+    loadedPlaylists.forEach(playlist => {
+        const playlistButton = makeDiv(['playlist_item', playlist.id], () => {
+            setCurrentPlaylist(playlist.id);
+            fetchSongs();
+        });
+
+        playlistButton.textContent = playlist.name;
+
+        container.append(playlistButton);
+    });
+};
+
 const globalSongFilter = {
-    name: 'P',
-    author: 'R'
+    name: null,
+    author: null,
+    playlist_id: 0
+};
+
+const fetchPlaylists = () => {
+    const onLoad = (result) => {
+        console.log(result);
+        loadedPlaylists = result;
+        refreshPlaylists();
+    };
+
+    fetch(`GetPlaylists?user_id=1`)
+        .then(response => response.json())
+        .then(json => onLoad(json));
+};
+
+
+const fetchSongs = (setSongOnLoad = false) => {
+    const onLoad = (result) => {
+        loadedSongs = result;
+        refreshSongList();
+        if (setSongOnLoad) setSong(loadedSongs[0].id, false);
+    };
+
+    const filter = globalSongFilter;
+    let query = '?';
+    for (let option in filter) {
+        if (filter[option]) query += `${option}=${filter[option]}&`;
+    }
+
+    fetch(`GetSongs${query}`)
+        .then(response => response.json())
+        .then(json => onLoad(json));
 };
 
 window.onload = () => {
-   fetchAllSongs((result) => {
-        loadedSongs = result;
-        refreshSongList();
-       setSong(loadedSongs[0].id, false);
-   }, globalSongFilter);
+    fetchSongs(true);
+
+    fetchPlaylists();
 };
 
