@@ -82,6 +82,86 @@ const makeIcon = (classes) => {
     return i;
 };
 
+const makeInput = (type, placeholder, name) => {
+    const input = document.createElement('input');
+    input.type = type;
+    input.placeholder = placeholder;
+    input.name = name;
+    return input;
+};
+
+const makeClickBlocker = () => {
+    const blocker = makeDiv(['click_blocker'], () => {
+        blocker.parentElement.parentElement.removeChild(blocker.parentElement);
+    });
+    return blocker;
+};
+
+const makeHeader = (size, text) => {
+    const header = document.createElement(`h${size}`);
+    header.textContent = text;
+    return header;
+};
+
+const showLoginForm = () => {
+    const container = makeDiv(['form_container']);
+    {
+        const clickBlocker = makeClickBlocker();
+        container.append(clickBlocker);
+
+        const form = document.createElement('form');
+        {
+            const loginResultHandler = (result) => {
+                message.classList.remove('hidden', 'success', 'fail');
+
+                if (result.status) {
+                    onLoginSuccesful(result);
+                    message.classList.add('success');
+                    message.textContent = result.message;
+
+                    loginInput.classList.add('hidden');
+                    passwordInput.classList.add('hidden');
+                    submit.classList.add('hidden');
+
+                } else {
+                    message.classList.add('fail');
+                    message.textContent = result.message;
+                }
+            };
+
+            form.method = 'post';
+            form.enctype = "multipart/form-data";
+
+            const header = makeHeader(3, 'Sign in');
+            form.append(header);
+
+            const loginInput = makeInput('text', 'Username', 'username');
+            form.append(loginInput);
+
+            const passwordInput = makeInput('password', 'Password', 'password');
+            form.append(passwordInput);
+
+            const submit = makeInput('submit');
+            submit.addEventListener('click', (evt) => {
+                evt.preventDefault();
+
+                const formData = new FormData(form);
+
+                sendLoginRequest(loginResultHandler, formData);
+            });
+            submit.value = 'Login';
+            form.append(submit);
+
+            const message = makeDiv(['message', 'hidden']);
+            form.append(message);
+
+            container.append(form);
+        }
+    }
+
+    document.body.append(container);
+};
+
 const refreshSongList = () => {
 
     const container = document.querySelector('div.song_list');
@@ -179,7 +259,7 @@ const fetchPlaylists = () => {
         refreshPlaylists();
     };
 
-    fetch(`GetPlaylists?user_id=1`)
+    fetch(`GetPlaylists?user_id=${loggedUserId}`)
         .then(response => response.json())
         .then(json => onLoad(json));
 };
@@ -203,9 +283,78 @@ const fetchSongs = (setSongOnLoad = false) => {
         .then(json => onLoad(json));
 };
 
-window.onload = () => {
-    fetchSongs(true);
+const onLoginSuccesful = (result) => {
+    loggedUserId = result.userId;
+    loggedUsername = result.username;
+    setUser();
+    fetchPlaylists();
+    fetchSongs();
+}; 
 
+const onLogout = () => {
+    loggedUserId = 0;
+    loggedUsername = null;
+    setUser();
+    fetchPlaylists();
+    fetchSongs();
+};
+
+const sendLoginRequest = (loginResultHandler, credentials) => {
+    const onResult = (result) => {
+        loginResultHandler(result);
+    };
+
+    fetch('Login', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+        },
+        body: credentials,
+        credentials: 'include'
+    }).then(response => response.json()).then(result => onResult(result));
+};
+
+const sendLogoutRequest = () => {
+    fetch('Logout')
+        .then(response => response.json())
+        .then(json => {
+            onLogout();
+        });
+};
+
+const setUser = () => {
+    const userContainer = document.querySelector('div#user_container');
+
+    userContainer.innerHTML = "";
+
+    if (loggedUserId !== 0) {
+        const usernameContainer = makeDiv(['username_container']);
+        usernameContainer.textContent = loggedUsername;
+        userContainer.append(usernameContainer);
+
+        const logoutButton = makeDiv(['button_logout'], () => {
+            sendLogoutRequest();
+        });
+
+        const icon = makeIcon(['fas', 'fa-sign-out-alt']);
+        logoutButton.append(icon);
+        userContainer.append(logoutButton);
+
+    } else {
+        const loginButton = makeDiv(['button_login'], () => {
+            showLoginForm();
+        });
+        const icon = makeIcon(['fas', 'fa-sign-in-alt']);
+        loginButton.append(icon);
+
+        userContainer.append(loginButton);
+    }
+};
+
+window.onload = () => {
+    setUser();
+    fetchSongs(true);
     fetchPlaylists();
 };
 

@@ -3,10 +3,20 @@
 @{
     ViewData["Title"] = "Home page";
 }
+@using Microsoft.AspNetCore.Http;
+
+<script>
+    let loggedUserId = Number(@HttpContext.Session.GetInt32("LoggedUserId"));
+    let loggedUsername = String('@HttpContext.Session.GetString("LoggedUsername")');
+</script>
+
 
 <link rel="stylesheet" href="~/css/index.css" />
 
 <div class="content_container">
+    <form method="post" enctype="multipart/form-data" class="dummy_form">
+    </form>
+
     <section class="left_menu">
         <input class="search_input name" placeholder="Name..." oninput="handleSearchInputChange('name')" />
         <input class="search_input author" placeholder="Author..." oninput="handleSearchInputChange('author')" />
@@ -19,7 +29,7 @@
         <div class="grid_container song_list_header">
             <div class="grid_row">
                 <div class='grid_col-1'>
-                    
+
                 </div>
                 <div class='grid_col-4'>Name</div>
                 <div class='grid_col-4'>Author</div>
@@ -30,14 +40,14 @@
 
         <div class="grid_container song_list">
 
-          
+
         </div>
     </section>
 
     <section class="player_container">
 
         <div id="song_title">
-                
+
         </div>
 
         <div class="button_previous" onclick="previousSong()">
@@ -45,18 +55,18 @@
         </div>
 
         <audio id="player" volume=0.5 controls onended="nextSong()">
-                
         </audio>
 
         <div class="button_next" onclick="nextSong()">
             <i class="fas fa-forward"></i>
         </div>
-        
+
 
     </section>
 </div>
 
 <script src="~/js/index.js"></script>
+
 
 
 

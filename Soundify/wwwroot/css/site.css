@@ -63,6 +63,12 @@ body {
 header {
   height: 60px; }
 
+#user_container {
+  display: flex;
+  min-width: 100px;
+  justify-content: space-evenly;
+  text-align: center; }
+
 .container {
   height: calc(100% - 60px);
   margin: 0;

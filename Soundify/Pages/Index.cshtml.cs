@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using NAudio.Wave;
+using Newtonsoft.Json;
 using Soundify.Models;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 
 namespace Soundify.Pages
 {
@@ -24,7 +26,7 @@ namespace Soundify.Pages
         {
             _logger = logger;
             _db = db;
-
+            
         }
 
         public IList<Music> Musics { get; set; }
