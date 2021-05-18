@@ -26,7 +26,7 @@ namespace Soundify.Pages
         public JsonResult OnPost([FromForm] PlaylistMusic playlistMusic)
         {
             _db.playlistMusic.Add(playlistMusic);
-            if (_db.playlistMusic.Any(p => p.music_id == playlistMusic.music_id)) {
+            if (_db.playlistMusic.Any(p => p.music_id == playlistMusic.music_id && p.playlist_id == playlistMusic.playlist_id)) {
                 return new JsonResult(new CreatePlaylistStatus { status = false, message = "This song already exists in given playlist" });
             } 
 

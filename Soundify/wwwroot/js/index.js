@@ -434,8 +434,10 @@ const sendLoginRequest = (credentials, formUpdate) => {
 const sendAddToPlaylistRequest = (data, formUpdate) => {
     const onResult = (result) => {
         formUpdate(result);
+        console.log(result);
         if (result.status) {
-            onSongAddedToPlaylist(result);
+
+            //onSongAddedToPlaylist(result);
         }
     };
 
