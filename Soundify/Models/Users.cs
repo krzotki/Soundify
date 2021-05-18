@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.SqlTypes;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Soundify.Models
 {
@@ -13,7 +14,9 @@ namespace Soundify.Models
     {
         [Key]
         public int id { get; set; }
+        [BindProperty]
         public string username { get; set; }
+        [BindProperty]
         public string password { get; set; }
     }
 }

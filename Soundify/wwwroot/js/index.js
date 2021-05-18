@@ -32,7 +32,7 @@ const setSong = (id, play = false) => {
     const title = document.getElementById('song_title');
     title.textContent = song.author + ' - ' + song.name;
 
-    setActive(id);
+    setActiveSong(id);
 };
 
 const nextSong = () => {
@@ -51,13 +51,21 @@ const previousSong = () => {
     setSong(loadedSongs[index].id, true);
 };
 
-const setActive = (id) => {
+const setActiveSong = (id) => {
     const allSongs = document.getElementsByClassName('song_item');
     for (var i = 0; i < allSongs.length; i++) {
         allSongs[i].classList.remove('active');
         if (allSongs[i].classList.contains(id)) allSongs[i].classList.add('active');
     }
 
+};
+
+const setActivePlaylist = (id) => {
+    const allPlaylists = document.getElementsByClassName('playlist_item');
+    for (var i = 0; i < allPlaylists.length; i++) {
+        allPlaylists[i].classList.remove('active');
+        if (allPlaylists[i].classList.contains(id)) allPlaylists[i].classList.add('active');
+    }
 };
 
 const handleSearchInputChange = (filter) => {
@@ -103,64 +111,129 @@ const makeHeader = (size, text) => {
     return header;
 };
 
-const showLoginForm = () => {
+const makeFormModal = (title, inputs, onSubmit, submitText) => {
     const container = makeDiv(['form_container']);
     {
+        const updateForm = (result) => {
+            message.classList.remove('hidden', 'success', 'fail');
+
+            if (result.status) {
+                message.classList.add('success');
+                message.textContent = result.message;
+
+                inputs.forEach(input => input.classList.add('hidden'));
+                submit.classList.add('hidden');
+
+            } else {
+                message.classList.add('fail');
+                message.textContent = result.message;
+            }
+        };
+
         const clickBlocker = makeClickBlocker();
         container.append(clickBlocker);
 
         const form = document.createElement('form');
         {
-            const loginResultHandler = (result) => {
-                message.classList.remove('hidden', 'success', 'fail');
-
-                if (result.status) {
-                    onLoginSuccesful(result);
-                    message.classList.add('success');
-                    message.textContent = result.message;
-
-                    loginInput.classList.add('hidden');
-                    passwordInput.classList.add('hidden');
-                    submit.classList.add('hidden');
-
-                } else {
-                    message.classList.add('fail');
-                    message.textContent = result.message;
-                }
-            };
-
             form.method = 'post';
             form.enctype = "multipart/form-data";
 
-            const header = makeHeader(3, 'Sign in');
+            const header = makeHeader(3, title);
             form.append(header);
+        }
 
-            const loginInput = makeInput('text', 'Username', 'username');
-            form.append(loginInput);
+        inputs.forEach(input => form.appendChild(input));
 
-            const passwordInput = makeInput('password', 'Password', 'password');
-            form.append(passwordInput);
+        const submit = makeInput('submit');
+        submit.addEventListener('click', (evt) => {
+            evt.preventDefault();
 
-            const submit = makeInput('submit');
-            submit.addEventListener('click', (evt) => {
-                evt.preventDefault();
-
-                const formData = new FormData(form);
-
-                sendLoginRequest(loginResultHandler, formData);
+            const formData = new FormData(form);
+            onSubmit(formData, (result) => {
+                updateForm(result);
             });
-            submit.value = 'Login';
-            form.append(submit);
+        });
+        submit.value = submitText;
+        form.append(submit);
 
-            const message = makeDiv(['message', 'hidden']);
-            form.append(message);
 
-            container.append(form);
+        const message = makeDiv(['message', 'hidden']);
+        form.append(message);
+
+        container.append(form);
+    }
+
+    return container;
+};
+
+const makeSongOptions = (id) => {
+    const container = makeDiv(['song_options', 'hidden']);
+    {
+        const addToPlaylist = makeDiv(['option_item', 'add_to_playlist']);
+        {
+            addToPlaylist.textContent = 'Add to playlist';
+            container.append(addToPlaylist);
+            addToPlaylist.addEventListener('click', () => {
+                showAddToPlaylistForm(id);
+            });
+        }
+
+        const removeFromPlaylist = makeDiv(['option_item', 'remove_from_playlist']);
+        {
+            removeFromPlaylist.textContent = 'Remove from this playlist';
+            if (CURRENT_PLAYLIST) {
+                container.append(removeFromPlaylist);
+            }
         }
     }
 
+    container.addEventListener('pointerleave', () => container.classList.add('hidden'));
+
+    return container;
+};
+
+const newPlaylist = () => {
+    if (loggedUserId === 0) {
+        showLoginForm();
+        return;
+    }
+
+    const input1 = makeInput('text', 'Name', 'name');
+
+    const container = makeFormModal('New playlist', [input1], (form, formUpdate) => { sendCreatePlaylistRequet(form, formUpdate)},  'Create');
     document.body.append(container);
 };
+
+const showLoginForm = () => {
+    const loginInput = makeInput('text', 'Username', 'username');
+
+    const passwordInput = makeInput('password', 'Password', 'password');
+
+    const container = makeFormModal('Login', [loginInput, passwordInput], (form, formUpdate) => { sendLoginRequest(form, formUpdate) }, 'Login');
+    document.body.append(container);
+};
+
+const showAddToPlaylistForm = (songId) => {
+
+    const select = document.createElement('select');
+    select.name = 'playlist_id';
+    select.classList.add('form-control');
+
+    loadedPlaylists.forEach(playlist => {
+        const option = document.createElement('option');
+        option.value = playlist.id;
+        option.textContent = playlist.name;
+        select.append(option);
+    });
+
+    const hiddenInput = makeInput('number', 'Music', 'music_id');
+    hiddenInput.value = songId;
+    hiddenInput.classList.add('hidden');
+
+    const container = makeFormModal('Add to playlist', [select, hiddenInput], (form, formUpdate) => { sendAddToPlaylistRequest(form, formUpdate) }, 'Add');
+    document.body.append(container);
+};
+
 
 const refreshSongList = () => {
 
@@ -202,12 +275,23 @@ const refreshSongList = () => {
 
             const optionsColumn = makeDiv(['grid_col-1']);
             {
-                const buttonOptions = makeDiv(['button_options'], () => console.log('options'));
-                {
-                    const optionsIcon = makeIcon(["fas", "fa-ellipsis-h"]);
-                    buttonOptions.append(optionsIcon);
-                    optionsColumn.append(buttonOptions);
-                }
+                const buttonOptions = makeDiv(['button_options'], () => {
+                    optionsContainer.classList.remove('hidden');
+
+                    const position = buttonOptions.getBoundingClientRect();
+                    optionsContainer.style.top = `${position.y}px`;
+                    optionsContainer.style.right = `${window.innerWidth - position.x - position.width}px`;
+
+                    console.log(position, optionsContainer.style);
+                });
+               
+                const optionsIcon = makeIcon(["fas", "fa-ellipsis-h"]);
+                buttonOptions.append(optionsIcon);
+                optionsColumn.append(buttonOptions);
+
+                const optionsContainer = makeSongOptions(song.id);
+                buttonOptions.append(optionsContainer);
+                
                 row.append(optionsColumn);
             }
         }
@@ -218,6 +302,7 @@ const refreshSongList = () => {
 };
 
 const setCurrentPlaylist = (id) => {
+    setActivePlaylist(id);
     globalSongFilter.playlist_id = id;
     CURRENT_PLAYLIST = id;
 };
@@ -226,7 +311,7 @@ const refreshPlaylists = () => {
     const container = document.querySelector('div#playlist_list');
     container.innerHTML = '';
 
-    const allSongsButton = makeDiv(['playlist_item', 'all_songs'], () => {
+    const allSongsButton = makeDiv(['playlist_item', 'all_songs', 0], () => {
         setCurrentPlaylist(0);
         fetchSongs();
     });
@@ -244,6 +329,10 @@ const refreshPlaylists = () => {
 
         container.append(playlistButton);
     });
+
+    if (!CURRENT_PLAYLIST) {
+        setCurrentPlaylist(0);
+    }
 };
 
 const globalSongFilter = {
@@ -299,9 +388,36 @@ const onLogout = () => {
     fetchSongs();
 };
 
-const sendLoginRequest = (loginResultHandler, credentials) => {
+const onPlaylistCreate = (result) => {
+    fetchPlaylists();
+};
+
+const sendCreatePlaylistRequet = (playlistData, formUpdate) => {
     const onResult = (result) => {
-        loginResultHandler(result);
+        formUpdate(result);
+        if (result.status) {
+            onPlaylistCreate(result);
+        }
+    };
+
+    fetch('CreatePlaylist', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+        },
+        body: playlistData,
+        credentials: 'include'
+    }).then(response => response.json()).then(result => onResult(result));
+};
+
+const sendLoginRequest = (credentials, formUpdate) => {
+
+    const onResult = (result) => {
+        formUpdate(result);
+        if (result.status) {
+            onLoginSuccesful(result);
+        }
     };
 
     fetch('Login', {
@@ -311,6 +427,25 @@ const sendLoginRequest = (loginResultHandler, credentials) => {
             "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
         },
         body: credentials,
+        credentials: 'include'
+    }).then(response => response.json()).then(result => onResult(result));
+};
+
+const sendAddToPlaylistRequest = (data, formUpdate) => {
+    const onResult = (result) => {
+        formUpdate(result);
+        if (result.status) {
+            onSongAddedToPlaylist(result);
+        }
+    };
+
+    fetch('AddToPlaylist', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+        },
+        body: data,
         credentials: 'include'
     }).then(response => response.json()).then(result => onResult(result));
 };
