@@ -264,7 +264,21 @@ form div.message.success {
 
 form div.message.fail {
     color: red;
-} 
+}
+
+form .no_account {
+    text-align: center;
+    font-size: 14px;
+}
+
+form .button_back {
+    align-self: flex-start;
+}
+
+form .no_account input{
+    background: white;
+    width: 70%;
+}
 
 .dummy_form {
     display: none;

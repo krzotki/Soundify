@@ -9,11 +9,8 @@ using Soundify.Models;
 
 namespace Soundify.Pages
 {
-    public class CreatePlaylistStatus
+    public class CreatePlaylistStatus : RequestStatus
     {
-        public string message { get; set; }
-        public bool status { get; set; }
-
         public int id { get; set; }
         public string name { get; set; }
     }

@@ -10,23 +10,12 @@ using Soundify.Models;
 
 namespace Soundify.Pages
 {
-    public class LoginStatus
-    {
-        public string message { get; set; }
-        public bool status { get; set; }
-
+    public class LoginStatus : RequestStatus
+    { 
         public int userId { get; set; }
         public string username { get; set; }
     }
 
-    public class LoginCredentials
-    {
-        [BindProperty]
-        public string username { get; set; }
-
-        [BindProperty]
-        public string password { get; set; }
-    }
     public class LoginModel : PageModel
     {
         DatabaseContext _db;
@@ -36,7 +25,7 @@ namespace Soundify.Pages
         }
 
 
-        public JsonResult OnPost([FromForm] LoginCredentials data)
+        public JsonResult OnPost([FromForm] Users data)
         {
             Users user = _db.users.Where(user => user.username == data.username && user.password == data.password).FirstOrDefault();
             if (user != null)

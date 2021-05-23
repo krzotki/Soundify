@@ -161,6 +161,7 @@ const makeFormModal = (title, inputs, onSubmit, submitText) => {
         form.append(message);
 
         container.append(form);
+        container.form = form;
     }
 
     return container;
@@ -183,7 +184,13 @@ const makeSongOptions = (id) => {
             removeFromPlaylist.textContent = 'Remove from this playlist';
             if (CURRENT_PLAYLIST) {
                 container.append(removeFromPlaylist);
+
+                removeFromPlaylist.addEventListener('click', () => {
+                    sendDeleteFromPlaylistRequest(id, CURRENT_PLAYLIST);
+                });
+
             }
+            
         }
     }
 
@@ -210,6 +217,51 @@ const showLoginForm = () => {
     const passwordInput = makeInput('password', 'Password', 'password');
 
     const container = makeFormModal('Login', [loginInput, passwordInput], (form, formUpdate) => { sendLoginRequest(form, formUpdate) }, 'Login');
+
+    const noAccount = makeDiv(['no_account']);
+    {
+        noAccount.textContent = "Don't have an account?";
+        container.form.append(noAccount);
+
+        const registerButton = makeInput('submit');
+        {
+            registerButton.value = 'Register';
+            noAccount.append(registerButton);
+
+            registerButton.addEventListener('click', (evt) => {
+                evt.preventDefault();
+                container.parentElement.removeChild(container);
+                showRegisterForm();
+            });
+        }
+
+    }
+   
+    document.body.append(container);
+};
+
+const showRegisterForm = () => {
+    const loginInput = makeInput('text', 'Username', 'username');
+
+    const passwordInput = makeInput('password', 'Password', 'password');
+
+    const container = makeFormModal('Register', [loginInput, passwordInput], (form, formUpdate) => { sendRegisterRequest(form, formUpdate) }, 'Register');
+
+    const backButton = makeDiv(['button_back']);
+    {
+        const icon = makeIcon(["fas", "fa-arrow-left"]);
+        backButton.append(icon);
+
+        backButton.addEventListener('click', (evt) => {
+            evt.preventDefault();
+
+            container.parentElement.removeChild(container);
+            showLoginForm();
+        });
+
+        container.form.prepend(backButton);
+    }
+
     document.body.append(container);
 };
 
@@ -380,6 +432,14 @@ const onLoginSuccesful = (result) => {
     fetchSongs();
 }; 
 
+const onRegisterSuccesful = (result) => {
+    
+};
+
+const onSongDeletedFromPlaylist = () => {
+    fetchSongs();
+};
+
 const onLogout = () => {
     loggedUserId = 0;
     loggedUsername = null;
@@ -431,6 +491,26 @@ const sendLoginRequest = (credentials, formUpdate) => {
     }).then(response => response.json()).then(result => onResult(result));
 };
 
+const sendRegisterRequest = (credentials, formUpdate) => {
+    console.log(credentials)
+    const onResult = (result) => {
+        formUpdate(result);
+        if (result.status) {
+            onRegisterSuccesful(result);
+        }
+    };
+
+    fetch('Register', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+        },
+        body: credentials,
+        credentials: 'include'
+    }).then(response => response.json()).then(result => onResult(result));
+};
+
 const sendAddToPlaylistRequest = (data, formUpdate) => {
     const onResult = (result) => {
         formUpdate(result);
@@ -458,6 +538,14 @@ const sendLogoutRequest = () => {
         .then(json => {
             onLogout();
         });
+};
+
+const sendDeleteFromPlaylistRequest = (musicId, playlistId) => {
+    fetch(`DeleteFromPlaylist?musicId=${musicId}&playlistId=${playlistId}`)
+        .then(response => response.json())
+        .then(json => {
+            onSongDeletedFromPlaylist();
+        });;
 };
 
 const setUser = () => {
